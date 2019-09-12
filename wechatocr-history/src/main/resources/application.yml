@@ -1,0 +1,12 @@
+spring:
+  cloud:
+    stream:
+      rocketmq:
+        binder:
+          namesrv-addr: 139.159.161.92:9876
+        bindings:
+          input: {consumer.orderly: true}
+      bindings:
+        input: {destination: topic-history, content-type: application/json, group: group-history, consumer.maxAttempts: 1}
+logging:
+  config: classpath:logback.xml

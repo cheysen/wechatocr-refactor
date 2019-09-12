@@ -7,6 +7,6 @@ package wechatocr.picture.text.constant;
  * @Version 1.0
  */
 public class PictureTextConstant {
-    protected static final int WECHAT_MAX_WORDS = 2047;
-    protected static final String SUCCESS = "success";
+    public static final int WECHAT_MAX_WORDS = 2047;
+    public static final String SUCCESS = "success";
 }

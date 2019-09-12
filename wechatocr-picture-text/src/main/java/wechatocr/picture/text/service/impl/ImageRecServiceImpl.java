@@ -3,19 +3,30 @@ package wechatocr.picture.text.service.impl;
 import com.qiniu.common.Zone;
 import com.qiniu.storage.model.DefaultPutRet;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.messaging.MessageChannel;
+import org.springframework.messaging.support.MessageBuilder;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.stereotype.Service;
 import wechatocr.constant.QiNiuKey;
-import wechatocr.message.response.TextMessage;
+import wechatocr.domain.data.object.UserOcrHistory;
+import wechatocr.domain.message.response.TextMessage;
 import wechatocr.picture.text.constant.PictureTextConstant;
 import wechatocr.picture.text.service.ImageRecService;
 import wechatocr.service.baidu.BaiDuOcrService;
 import wechatocr.service.qiniu.QiNiuService;
 import wechatocr.utils.ContentUtils;
+import wechatocr.utils.JacksonUtils;
 import wechatocr.utils.MyMessageUtils;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.sql.Timestamp;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @Author Cheysen
@@ -23,31 +34,47 @@ import java.util.Map;
  * @Date 2019/8/29 23:36
  * @Version 1.0
  */
+@Service
 public class ImageRecServiceImpl implements ImageRecService {
     private String respMsg = PictureTextConstant.SUCCESS;
     @Autowired
     private BaiDuOcrService baiDuOcrService;
     @Autowired
     private QiNiuService qiNiuService;
+    @Autowired
+    private RedisTemplate redisTemplate;
+    @Autowired
+    private MessageChannel output;
+
     @Override
-    public void textRecognition(Map<String, String> reqMap, String msgId, TextMessage textMessage) {
+    @SuppressWarnings("unchecked")
+    public String textRecognition(Map<String, String> reqMap, String msgId, TextMessage textMessage) {
         String picUrl = reqMap.get("PicUrl");
-        String response = "";
-        logger.info("微信端发送图片URL为:" + picUrl);
-        /*HashMap<String,String> cacheMap = (HashMap<String, String>) ImageToTextCache.getInstance().getCache();
-        if (cacheMap.containsKey(msgId)) {
-            logger.info("上一次请求超时,此次请求从缓存中拿取数据不再请求百度OCR的API");
-            response = cacheMap.get(msgId);
-            if(!SUCCESS.equals(response)) {
-                textMessage.setContent(response);
-                respMsg = MessageUtils.textMessageToXML(textMessage);
-            }else {
-                respMsg = response;
+        String response ;
+        logger.info("微信端发送图片URL:" + picUrl);
+        Boolean cache = redisTemplate.hasKey(msgId);
+        if (Boolean.TRUE.equals(cache)) {
+            logger.info("上一次请求超时,此次请求尝试不断从缓存中拿取数据");
+            String cacheResponse = (String) redisTemplate.opsForValue().get(msgId);
+            if (!PictureTextConstant.SUCCESS.equals(cacheResponse)) {
+                respMsg = cacheResponse;
+            } else {
+                getCacheResultCas(msgId);
             }
-        }*/ else {
+            return respMsg;
+
+        } else {
             try {
+                redisTemplate.opsForValue().set(msgId, "success");
+                logger.info("msgId:{} 存放至redis",msgId);
                 response = baiDuOcrService.postAccurateBasic(picUrl);
+                UserOcrHistory userOcrHistory = new UserOcrHistory();
+                userOcrHistory.setMsgId(msgId);
+                userOcrHistory.setOpenId(reqMap.get("FromUserName"));
+                userOcrHistory.setMsgType(reqMap.get("MsgType"));
+                userOcrHistory.setCreateTime(new Timestamp(System.currentTimeMillis()));
                 if (!PictureTextConstant.SUCCESS.equals(response)) {
+                    userOcrHistory.setContent(response);
                     // 汉字采用utf-8编码时占3个字节
                     int size = response.getBytes(StandardCharsets.UTF_8).length;
                     if (size > PictureTextConstant.WECHAT_MAX_WORDS) {
@@ -69,14 +96,57 @@ public class ImageRecServiceImpl implements ImageRecService {
                     }
                     textMessage.setContent(response);
                     respMsg = MyMessageUtils.textMessageToXML(textMessage);
+                    sendToRocketMq(userOcrHistory);
                     logger.info("提取拼接文字内容结束");
                 } else {
                     respMsg = response;
                 }
+                return respMsg;
             } catch (IOException e) {
                 e.printStackTrace();
-            }finally {
+                return respMsg;
+            } finally {
+                redisTemplate.opsForValue().set(msgId, respMsg, 60 * 10, TimeUnit.SECONDS);
+            }
+        }
+    }
 
+    @Async
+    public void sendToRocketMq(UserOcrHistory userOcrHistory) {
+        try {
+            output.send(MessageBuilder.withPayload(JacksonUtils.obj2json(userOcrHistory)).build());
+            logger.info("识别结果发送到消息队列");
+        } catch (Exception e) {
+            logger.error("发送到消息队列时异常");
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * 自旋锁的形式获取缓存内容。只在第二三次请求到来时有效，如果第二次仍没有值，则在第三次请求中返回。
+     */
+    @SuppressWarnings("unchecked")
+    private void getCacheResultCas(String msgId) {
+        String secondReq = msgId + "2";
+        Instant start = Instant.now();
+        Instant end = Instant.now();
+        while (PictureTextConstant.SUCCESS.equals(redisTemplate.opsForValue().get(msgId)) && Duration.between(start, end).getSeconds() <= 4) {
+            end = Instant.now();
+        }
+        String result = (String) redisTemplate.opsForValue().get(msgId);
+        if (PictureTextConstant.SUCCESS.equals(result)) {
+            redisTemplate.opsForValue().set(secondReq, "false");
+        } else {
+            respMsg = result;
+            logger.warn("此次微信端请求在第二次重试时请求成功");
+        }
+        //判断这是第三次请求
+        if (Boolean.TRUE.equals(redisTemplate.hasKey(secondReq))) {
+            if (PictureTextConstant.SUCCESS.equals(result)) {
+                logger.error("三次请求全部超时");
+            } else {
+                respMsg = result;
+                logger.warn("此次微信端请求在第三次重试时才请求成功");
             }
         }
     }

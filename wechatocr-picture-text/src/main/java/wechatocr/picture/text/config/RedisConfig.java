@@ -13,11 +13,11 @@ import redis.clients.jedis.JedisPoolConfig;
 
 /**
  * @Author Cheysen
- * @Description
+ * @Description 以Java代码的方式配置RedisTemplate
  * @Date 2019/8/7 1:47
  * @Version 1.0
  */
-@Configuration
+//@Configuration
 public class RedisConfig {
     private RedisConnectionFactory redisConnectionFactory = null;
 

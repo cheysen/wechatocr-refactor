@@ -3,6 +3,6 @@ spring:
     stream:
       rocketmq:
         binder:
-          namesrv-addr: 192.168.10.149:9876
+          namesrv-addr: 139.159.161.92:9876
       bindings:
-        output: {destination: topic-email, content-type: application/json}
+        output: {destination: topic-history, content-type: application/json}

@@ -13,7 +13,7 @@
 
         <!-- 配置 tk.mybatis 插件 -->
         <plugin type="tk.mybatis.mapper.generator.MapperPlugin">
-            <property name="mappers" value="tk.mybatis.mapper.MyMapper"/>
+            <property name="mappers" value="tk.mybatis.mapper.tkmybatis.MyMapper"/>
         </plugin>
 
         <!-- 配置数据库连接 -->
@@ -25,19 +25,19 @@
         </jdbcConnection>
 
         <!-- 配置实体类存放路径 -->
-        <javaModelGenerator targetPackage="com.funtl.myshop.commons.domain" targetProject="src/main/java"/>
+        <javaModelGenerator targetPackage="wechatocr.commons.domain" targetProject="src/main/java"/>
 
         <!-- 配置 XML 存放路径 -->
         <sqlMapGenerator targetPackage="mapper" targetProject="src/main/resources"/>
 
         <!-- 配置 DAO 存放路径 -->
         <javaClientGenerator
-                targetPackage="com.funtl.myshop.commons.mapper"
+                targetPackage="wechatocr.commons.mapper"
                 targetProject="src/main/java"
                 type="XMLMAPPER"/>
 
         <!-- 配置需要指定生成的数据库和表，% 代表所有表 -->
-        <table catalog="myshop" tableName="%">
+        <table catalog="wechatocr" tableName="%">
             <!-- mysql 配置 -->
             <generatedKey column="id" sqlStatement="Mysql" identity="true"/>
         </table>

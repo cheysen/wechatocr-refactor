@@ -1,8 +1,8 @@
 package wechatocr.mapper.mymapper;
 
 
-import mapper.tkmybatis.MyMapper;
-import wechatocr.data.object.UserOcrHistory;
+import wechatocr.domain.data.object.UserOcrHistory;
+import wechatocr.mapper.tkmybatis.MyMapper;
 
 /**
  * @author Cheysen

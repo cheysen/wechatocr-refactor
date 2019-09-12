@@ -64,10 +64,11 @@ public class BaiDuOcrServiceImpl implements BaiDuOcrService {
         return "success";
     }
 
-    @Scheduled(fixedDelay = 2592000L*1000L)
+    @Scheduled(fixedDelay = 43200L*1000L)
     public void refreshAccessToken() throws BusinessException {
         String accessToken = baiDuAccTokenService.getAccToken();
         logger.info("获取百度access_token");
         apiUrl += accessToken;
     }
+
 }

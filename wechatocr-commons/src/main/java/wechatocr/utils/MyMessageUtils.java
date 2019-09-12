@@ -11,7 +11,8 @@ import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import wechatocr.message.response.TextMessage;
+import wechatocr.domain.message.response.TextMessage;
+
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
@@ -28,8 +29,8 @@ import java.util.Map;
  * @Date 2019/7/24 14:33
  * @Version 1.0
  */
-public class MessageUtils {
-    private static Logger logger = LoggerFactory.getLogger(MessageUtils.class);
+public class MyMessageUtils {
+    private static Logger logger = LoggerFactory.getLogger(MyMessageUtils.class);
     /**
      * 扩展XStream,使其支持CDATA块
      */

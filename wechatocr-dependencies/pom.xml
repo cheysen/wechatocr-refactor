@@ -35,7 +35,15 @@
         <qiniu.happy-dns-java.version>0.1.4</qiniu.happy-dns-java.version>
         <junit.version>4.12</junit.version>
         <common-email.version>1.5</common-email.version>
-        <jackson.version>2.9.9.3</jackson.version>
+        <commons-lang3.version>3.9</commons-lang3.version>
+        <jackson.version>2.9.9</jackson.version>
+        <json.version>20190722</json.version>
+        <spring-boot-alibaba-druid.version>1.1.10</spring-boot-alibaba-druid.version>
+        <spring-boot-tk-mybatis.version>2.1.4</spring-boot-tk-mybatis.version>
+        <spring-boot-pagehelper.version>1.2.10</spring-boot-pagehelper.version>
+        <lombok.version>1.18.8</lombok.version>
+        <!-- Commons Settings -->
+        <mysql.version>8.0.13</mysql.version>
     </properties>
 
     <dependencyManagement>
@@ -56,19 +64,9 @@
             </dependency>
 
             <dependency>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-starter-web</artifactId>
-            </dependency>
-
-            <dependency>
                 <groupId>org.projectlombok</groupId>
                 <artifactId>lombok</artifactId>
                 <optional>true</optional>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-starter-test</artifactId>
-                <scope>test</scope>
             </dependency>
             <!--对XML的读写支持-->
             <dependency>
@@ -99,7 +97,7 @@
                 <artifactId>logback-classic</artifactId>
                 <version>${logback.version}</version>
             </dependency>
-            <!--apache http IO-->
+            <!--apache http IO lang-->
             <dependency>
                 <groupId>org.apache.httpcomponents</groupId>
                 <artifactId>httpclient</artifactId>
@@ -110,6 +108,12 @@
                 <artifactId>commons-io</artifactId>
                 <version>${apache.commons-io.version}</version>
             </dependency>
+            <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-lang3 -->
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-lang3</artifactId>
+                <version>${commons-lang3.version}</version>
+            </dependency>
 
             <!--QiNiu-->
             <dependency>
@@ -118,6 +122,13 @@
                 <version>${qiniu-java-sdk.version}</version>
                 <scope>compile</scope>
             </dependency>
+            <dependency>
+                <groupId>com.qiniu</groupId>
+                <artifactId>happy-dns-java</artifactId>
+                <version>${qiniu.happy-dns-java.version}</version>
+                <scope>compile</scope>
+            </dependency>
+            <!--QiNiu End-->
             <dependency>
                 <groupId>com.squareup.okhttp3</groupId>
                 <artifactId>okhttp</artifactId>
@@ -136,12 +147,11 @@
                 <artifactId>jackson-databind</artifactId>
                 <version>${jackson.version}</version>
             </dependency>
-
+            <!-- https://mvnrepository.com/artifact/org.json/json -->
             <dependency>
-                <groupId>com.qiniu</groupId>
-                <artifactId>happy-dns-java</artifactId>
-                <version>${qiniu.happy-dns-java.version}</version>
-                <scope>compile</scope>
+                <groupId>org.json</groupId>
+                <artifactId>json</artifactId>
+                <version>${json.version}</version>
             </dependency>
             <dependency>
                 <groupId>junit</groupId>
@@ -156,9 +166,38 @@
                 <artifactId>commons-email</artifactId>
                 <version>${common-email.version}</version>
             </dependency>
+            <!-- Spring Boot Begin -->
+            <dependency>
+                <groupId>com.alibaba</groupId>
+                <artifactId>druid-spring-boot-starter</artifactId>
+                <version>${spring-boot-alibaba-druid.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>tk.mybatis</groupId>
+                <artifactId>mapper-spring-boot-starter</artifactId>
+                <version>${spring-boot-tk-mybatis.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.github.pagehelper</groupId>
+                <artifactId>pagehelper-spring-boot-starter</artifactId>
+                <version>${spring-boot-pagehelper.version}</version>
+            </dependency>
+            <!-- Spring Boot End -->
+
+            <!-- Commons Begin -->
+            <dependency>
+                <groupId>mysql</groupId>
+                <artifactId>mysql-connector-java</artifactId>
+                <version>${mysql.version}</version>
+            </dependency>
+
+            <!-- Commons End -->
+            <dependency>
+                <groupId>org.projectlombok</groupId>
+                <artifactId>lombok</artifactId>
+                <version>${lombok.version}</version>
+            </dependency>
         </dependencies>
-
-
     </dependencyManagement>
 
     <build>
@@ -259,7 +298,7 @@
             </resource>
         </resources>
     </build>
-
+    <!--
     <repositories>
         <repository>
             <id>aliyun-repos</id>
@@ -272,30 +311,6 @@
                 <enabled>false</enabled>
             </snapshots>
         </repository>
-
-        <repository>
-            <id>sonatype-repos</id>
-            <name>Sonatype Repository</name>
-            <url>https://oss.sonatype.org/content/groups/public</url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
-        <repository>
-            <id>sonatype-repos-s</id>
-            <name>Sonatype Repository</name>
-            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-            <releases>
-                <enabled>false</enabled>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </repository>
-
         <repository>
             <id>spring-snapshots</id>
             <name>Spring Snapshots</name>
@@ -313,7 +328,7 @@
             </snapshots>
         </repository>
     </repositories>
-
+    -->
     <pluginRepositories>
         <pluginRepository>
             <id>aliyun-repos</id>

@@ -1,9 +1,5 @@
-package pre.chl.wechatocr.utils;
+package wechatocr.utils;
 
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import pre.chl.wechatocr.exception.MessageException;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -21,8 +17,7 @@ import java.util.Arrays;
  */
 public class CheckSignatureUtils {
     private static final String TOKEN = "ocr2019";
-    private static Logger logger = LoggerFactory.getLogger(CheckSignatureUtils.class);
-    public static boolean check(String signature,String timestamp,String nonce) throws MessageException {
+    public static boolean check(String signature,String timestamp,String nonce) throws NoSuchAlgorithmException {
         String[] args = new String[]{TOKEN,timestamp,nonce};
         //将三个参数进行字典排序
         Arrays.sort(args);
@@ -30,19 +25,11 @@ public class CheckSignatureUtils {
         for (int i = 0; i < args.length; i++) {
             argStr.append(args[i]);
         }
-        MessageDigest md;
-        String tmpStr;
-        try {
-            md = MessageDigest.getInstance("SHA-1");
-            byte[] digest = md.digest(argStr.toString().getBytes());
-            tmpStr = byteToStr(digest);
-        }catch (NoSuchAlgorithmException e) {
-            logger.error("加密算法不存在");
-           throw new MessageException("此算法不存在");
-        }finally{
-            argStr = null;
-        }
-        return  tmpStr != null && tmpStr.equals(signature.toUpperCase());
+        MessageDigest md = MessageDigest.getInstance("SHA-1");
+        byte[] digest = md.digest(argStr.toString().getBytes());
+        String  tmpStr = byteToStr(digest);
+        argStr = null;
+        return  tmpStr.equals(signature.toUpperCase());
     }
     /**
      * @Description 将字节数组转换为十六进制字符串
