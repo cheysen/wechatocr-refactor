@@ -11,6 +11,7 @@ import org.apache.http.util.EntityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import wechatocr.constant.BaiDuKey;
 import wechatocr.exception.BusinessException;
 import wechatocr.service.baidu.BaiDuAccTokenService;
 import wechatocr.service.baidu.BaiDuOcrService;
@@ -31,7 +32,7 @@ import java.util.List;
  */
 @Service
 public class BaiDuOcrServiceImpl implements BaiDuOcrService {
-    private String apiUrl = "https://aip.baidubce.com/rest/2.0/ocr/v1/accurate_basic?access_token=";
+    private String apiUrl;
     @Autowired
     private BaiDuAccTokenService baiDuAccTokenService;
 
@@ -64,11 +65,15 @@ public class BaiDuOcrServiceImpl implements BaiDuOcrService {
         return "success";
     }
 
-    @Scheduled(fixedDelay = 43200L*1000L)
+
+    /** 定期获取access_token,过期时间为一个月
+     * @throws BusinessException
+     */
+    @Scheduled(fixedDelay = 2592100L*1000L)
     public void refreshAccessToken() throws BusinessException {
         String accessToken = baiDuAccTokenService.getAccToken();
         logger.info("获取百度access_token");
-        apiUrl += accessToken;
+        apiUrl = BaiDuKey.API_URL + accessToken;
     }
 
 }
