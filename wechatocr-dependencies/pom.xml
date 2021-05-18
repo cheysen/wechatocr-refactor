@@ -24,7 +24,7 @@
         <spring-cloud.version>Finchley.SR2</spring-cloud.version>
         <spring-cloud-alibaba.version>0.2.1.RELEASE</spring-cloud-alibaba.version>
         <dom4j.version>1.6.1</dom4j.version>
-        <xstream.version>1.4.11.1</xstream.version>
+        <xstream.version>1.4.17</xstream.version>
         <baidu.aip.java-sdk.version>4.11.3</baidu.aip.java-sdk.version>
         <logback.version>1.2.3</logback.version>
         <httpclient.version>4.5.9</httpclient.version>
