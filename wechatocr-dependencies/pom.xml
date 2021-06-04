@@ -27,7 +27,7 @@
         <xstream.version>1.4.11.1</xstream.version>
         <baidu.aip.java-sdk.version>4.11.3</baidu.aip.java-sdk.version>
         <logback.version>1.2.3</logback.version>
-        <httpclient.version>4.5.9</httpclient.version>
+        <httpclient.version>4.5.13</httpclient.version>
         <apache.commons-io.version>1.3.2</apache.commons-io.version>
         <qiniu-java-sdk.version>7.2.11</qiniu-java-sdk.version>
         <okhttp.version>3.3.1</okhttp.version>
